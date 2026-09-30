@@ -1,0 +1,142 @@
+[
+  {
+    "id": "5W7PDH",
+    "name": "KARINA",
+    "series": "BLACK MAMBA",
+    "rarity": "COMMON",
+    "image": "02C K.png"
+  },
+  {
+    "id": "2Y83EV",
+    "name": "GISELLE",
+    "series": "BLACK MAMBA",
+    "rarity": "COMMON",
+    "image": "02C G.png"
+  },
+  {
+    "id": "BD5S7F",
+    "name": "WINTER",
+    "series": "BLACK MAMBA",
+    "rarity": "COMMON",
+    "image": "02C W.png"
+  },
+  {
+    "id": "CBJP3J",
+    "name": "NINGNING",
+    "series": "BLACK MAMBA",
+    "rarity": "COMMON",
+    "image": "02C N.png"
+  },
+  {
+    "id": "HPW9DN",
+    "name": "KARINA",
+    "series": "SPICY",
+    "rarity": "UNCOMMON",
+    "image": "07C K.png"
+  },
+  {
+    "id": "VLVVAF",
+    "name": "GISELLE",
+    "series": "SPICY",
+    "rarity": "UNCOMMON",
+    "image": "07C G.png"
+  },
+  {
+    "id": "M82MBP",
+    "name": "WINTER",
+    "series": "SPICY",
+    "rarity": "UNCOMMON",
+    "image": "07C W.png"
+  },
+  {
+    "id": "0IGCUJ",
+    "name": "NINGNING",
+    "series": "SPICY",
+    "rarity": "UNCOMMON",
+    "image": "07C N.png"
+  },
+  {
+    "id": "F4URRH",
+    "name": "KARINA",
+    "series": "BETTER THINGS",
+    "rarity": "RARE",
+    "image": "08C K.png"
+  },
+  {
+    "id": "WY3HR8",
+    "name": "GISELLE",
+    "series": "BETTER THINGS",
+    "rarity": "RARE",
+    "image": "08C G.png"
+  },
+  {
+    "id": "PSFMN3",
+    "name": "WINTER",
+    "series": "BETTER THINGS",
+    "rarity": "RARE",
+    "image": "08C W.png"
+  },
+  {
+    "id": "TA0NEV",
+    "name": "NINGNING",
+    "series": "BETTER THINGS",
+    "rarity": "RARE",
+    "image": "08C N.png"
+  },
+  {
+    "id": "BQGX0G",
+    "name": "KARINA",
+    "series": "DIRTY WORK",
+    "rarity": "EPIC",
+    "image": "013C K.png"
+  },
+  {
+    "id": "1HXRR9",
+    "name": "GISELLE",
+    "series": "DIRTY WORK",
+    "rarity": "EPIC",
+    "image": "013C G.png"
+  },
+  {
+    "id": "LPYM5X",
+    "name": "WINTER",
+    "series": "DIRTY WORK",
+    "rarity": "EPIC",
+    "image": "013C W.png"
+  },
+  {
+    "id": "SS4AOV",
+    "name": "NINGNING",
+    "series": "DIRTY WORK",
+    "rarity": "EPIC",
+    "image": "013C N.png"
+  },
+  {
+    "id": "5PDVIS",
+    "name": "KARINA",
+    "series": "RICH MAN",
+    "rarity": "LEGENDARY",
+    "image": "014C K.png"
+  },
+  {
+    "id": "XZKA4W",
+    "name": "GISELLE",
+    "series": "RICH MAN",
+    "rarity": "LEGENDARY",
+    "image": "014C G.png"
+  },
+  {
+    "id": "17SKN2",
+    "name": "WINTER",
+    "series": "RICH MAN",
+    "rarity": "LEGENDARY",
+    "image": "014C W.png"
+  },
+  {
+    "id": "RZKHNM",
+    "name": "NINGNING",
+    "series": "RICH MAN",
+    "rarity": "LEGENDARY",
+    "image": "014C N.png"
+  }
+]
