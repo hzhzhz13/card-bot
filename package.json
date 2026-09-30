@@ -1,0 +1,29 @@
+{
+  "name": "discord-card-bot",
+  "version": "1.0.0",
+  "description": "A Discord collectible card bot with drop-3-claim-1 mechanics, weighted rarities, and persistent collections.",
+  "type": "module",
+  "main": "bot/index.js",
+  "scripts": {
+    "start": "node bot/index.js",
+    "deploy": "node bot/deploy-commands.js",
+    "seed:images": "node scripts/generate-sample-images.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "collectible",
+    "cards",
+    "game"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "sharp": "^0.35.5"
+  }
+}
