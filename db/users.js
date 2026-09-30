@@ -98,3 +98,89 @@ export function ownershipByCard() {
     GROUP BY card_id
   `).all();
 }
+
+// ── Coins / economy ──────────────────────────────────────────────────────
+
+export function getCoins(userId) {
+  const row = stmt('SELECT coins FROM users WHERE id = ?').get(userId);
+  return row?.coins ?? 0;
+}
+
+export function addCoins(userId, amount) {
+  stmt('UPDATE users SET coins = coins + ? WHERE id = ?').run(amount, userId);
+}
+
+// ── Daily reward ─────────────────────────────────────────────────────────
+
+/** Read daily-related state for a user. */
+export function getDailyState(userId) {
+  const row = stmt(
+    'SELECT last_daily_at, daily_streak FROM users WHERE id = ?'
+  ).get(userId);
+  return {
+    lastDailyAt: row?.last_daily_at ?? null,
+    streak: row?.daily_streak ?? 0,
+  };
+}
+
+/** Persist a claimed daily: award coins, set streak and timestamp atomically. */
+export const claimDaily = db.transaction((userId, coins, streak, nowMs) => {
+  stmt(
+    'UPDATE users SET coins = coins + ?, daily_streak = ?, last_daily_at = ? WHERE id = ?'
+  ).run(coins, streak, nowMs, userId);
+});
+
+// ── Card ownership helpers (for trade / burn) ──────────────────────────────
+
+/** Quantity of a specific card a user owns (0 if none). */
+export function getCardQuantity(userId, cardId) {
+  const row = stmt(
+    'SELECT quantity FROM user_cards WHERE user_id = ? AND card_id = ?'
+  ).get(userId, cardId);
+  return row?.quantity ?? 0;
+}
+
+/**
+ * Remove one copy of a card from a user. Decrements quantity, deleting the row
+ * when it hits zero. Returns true if a copy was removed.
+ */
+function removeOneCardInternal(userId, cardId) {
+  const qty = getCardQuantity(userId, cardId);
+  if (qty <= 0) return false;
+  if (qty === 1) {
+    stmt('DELETE FROM user_cards WHERE user_id = ? AND card_id = ?').run(userId, cardId);
+  } else {
+    stmt(
+      'UPDATE user_cards SET quantity = quantity - 1 WHERE user_id = ? AND card_id = ?'
+    ).run(userId, cardId);
+  }
+  return true;
+}
+
+export function removeOneCard(userId, cardId) {
+  return removeOneCardInternal(userId, cardId);
+}
+
+/** Burn a card for coins, atomically. Returns true on success. */
+export const burnCard = db.transaction((userId, cardId, coinValue) => {
+  const removed = removeOneCardInternal(userId, cardId);
+  if (!removed) return false;
+  stmt('UPDATE users SET coins = coins + ? WHERE id = ?').run(coinValue, userId);
+  return true;
+});
+
+/**
+ * Atomically swap one card between two users:
+ * userA gives cardA (and receives cardB), userB gives cardB (receives cardA).
+ * Returns true on success, false if either party no longer owns their card.
+ */
+export const swapCards = db.transaction((userA, cardA, userB, cardB) => {
+  if (getCardQuantity(userA, cardA) <= 0) return false;
+  if (getCardQuantity(userB, cardB) <= 0) return false;
+  removeOneCardInternal(userA, cardA);
+  removeOneCardInternal(userB, cardB);
+  // grantCard is defined earlier in this module
+  grantCard(userA, cardB);
+  grantCard(userB, cardA);
+  return true;
+});

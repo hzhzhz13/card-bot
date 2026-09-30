@@ -1,22 +1,9 @@
 import { REST, Routes } from 'discord.js';
 import { config } from './config.js';
-import * as dropCommand from './commands/drop.js';
-import * as collectionCommand from './commands/collection.js';
-import * as cardCommand from './commands/card.js';
-import * as cooldownsCommand from './commands/cooldowns.js';
-import * as statsCommand from './commands/stats.js';
-import * as spawnCommand from './commands/spawn.js';
-import * as giveCommand from './commands/give.js';
+import { loadCommandModules } from './load-commands.js';
 
-const commands = [
-  dropCommand,
-  collectionCommand,
-  cardCommand,
-  cooldownsCommand,
-  statsCommand,
-  spawnCommand,
-  giveCommand,
-].map((c) => c.data.toJSON());
+const modules = await loadCommandModules();
+const commands = modules.map((c) => c.data.toJSON());
 
 if (!config.token || !config.clientId) {
   console.error('❌ DISCORD_TOKEN and CLIENT_ID must be set in .env');
@@ -38,6 +25,7 @@ try {
     await rest.put(Routes.applicationCommands(config.clientId), { body: commands });
     console.log(`✅ Registered ${commands.length} global commands.`);
   }
+  console.log(`Commands: ${modules.map((c) => c.data.name).join(', ')}`);
 } catch (err) {
   console.error('Failed to register commands:', err);
   process.exit(1);

@@ -2,33 +2,20 @@ import { Client, GatewayIntentBits, Collection, Events, MessageFlags } from 'dis
 import { config } from './config.js';
 import { migrate } from '../db/database.js';
 import { loadCards, allCards } from '../db/cards.js';
-import * as dropCommand from './commands/drop.js';
-import * as collectionCommand from './commands/collection.js';
-import * as cardCommand from './commands/card.js';
-import * as cooldownsCommand from './commands/cooldowns.js';
-import * as statsCommand from './commands/stats.js';
-import * as spawnCommand from './commands/spawn.js';
-import * as giveCommand from './commands/give.js';
-import { handleClaimButton } from './interactions.js';
+import { loadCommandModules } from './load-commands.js';
+import { routeButton } from './interactions.js';
 
 // ── Startup: DB + catalog ──────────────────────────────────────────────
 migrate();
 loadCards();
 console.log(`Loaded ${allCards().length} cards from catalog.`);
 
-// ── Command registry ───────────────────────────────────────────────────
+// ── Command registry (auto-loaded from bot/commands/) ───────────────────
 const commands = new Collection();
-for (const cmd of [
-  dropCommand,
-  collectionCommand,
-  cardCommand,
-  cooldownsCommand,
-  statsCommand,
-  spawnCommand,
-  giveCommand,
-]) {
+for (const cmd of await loadCommandModules()) {
   commands.set(cmd.data.name, cmd);
 }
+console.log(`Loaded ${commands.size} commands: ${[...commands.keys()].join(', ')}`);
 
 // ── Client ─────────────────────────────────────────────────────────────
 const client = new Client({
@@ -46,9 +33,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       if (!command) return;
       await command.execute(interaction);
     } else if (interaction.isButton()) {
-      if (interaction.customId.startsWith('claim:')) {
-        await handleClaimButton(interaction);
-      }
+      await routeButton(interaction);
     }
   } catch (err) {
     console.error('Interaction error:', err);

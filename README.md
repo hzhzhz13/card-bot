@@ -31,8 +31,24 @@ Ships with a 20-card aespa set (4 members × 5 series, one per rarity tier).
 | `/card <id>` | Everyone | Inspect a card by its 6-character ID |
 | `/cooldowns` | Everyone | Check your remaining drop/claim cooldowns |
 | `/stats` | Everyone | Server-wide stats + top collectors |
+| `/trade <user> <your_card> <their_card>` | Everyone | Offer a card-for-card swap (target must accept) |
+| `/burn <card_id>` | Everyone | Destroy a card for coins (with confirmation) |
+| `/daily` | Everyone | Claim a daily coin reward with streak bonuses |
+| `/balance [user]` | Everyone | Check coin balance and daily streak |
 | `/spawn` | Admin | Force-spawn a drop, bypassing cooldown |
 | `/give <user> <card_id>` | Admin | Grant a specific card to a user |
+
+## 💰 Economy
+
+Coins are earned via `/daily` and `/burn`, and shown with `/balance`.
+
+- **`/daily`** — 100 base coins, once per 24h. Consecutive days build a **streak** (+10/day,
+  capped at +100, so 100–200/day). Miss a day (no claim within 48h) and the streak resets.
+- **`/burn`** — destroy a card for coins by rarity: Common 10 · Uncommon 25 · Rare 60 ·
+  Epic 150 · Legendary 400. Requires a confirmation click.
+- **`/trade`** — swap one of your cards for one of another user's. The recipient must click
+  **Accept**; the swap is applied atomically (ownership re-checked at accept time, so cards
+  can't be duplicated or stolen).
 
 ---
 
@@ -105,7 +121,31 @@ series + name), so player collections stay intact. To fully regenerate IDs, dele
 
 ### Tuning rarity drop rates
 Edit the `weight` values in [`utils/rarity.js`](utils/rarity.js). Weights are relative
-(they don't have to sum to 100).
+(they don't have to sum to 100). Burn values live alongside them as `burnValue`.
+
+---
+
+## ➕ Adding a new command
+
+Commands are **auto-loaded** from `bot/commands/` — just drop in a new file that exports
+`data` (a `SlashCommandBuilder`) and an `execute(interaction)` function:
+
+```js
+// bot/commands/ping.js
+import { SlashCommandBuilder } from 'discord.js';
+
+export const data = new SlashCommandBuilder()
+  .setName('ping')
+  .setDescription('Pong!');
+
+export async function execute(interaction) {
+  return interaction.reply({ content: '🏓 Pong!', ephemeral: true });
+}
+```
+
+Then `npm run deploy` to register it and restart the bot. No edits to `index.js` or
+`deploy-commands.js` needed. If your command uses buttons, add a handler and route it by
+its custom-ID prefix in [`bot/interactions.js`](bot/interactions.js) (see `trade`/`burn`).
 
 ---
 
@@ -119,8 +159,10 @@ discord-card-bot/
 │   ├── config.js             # Env loading + gameplay tuning
 │   ├── cooldowns.js          # Drop/claim cooldown logic
 │   ├── drops.js              # In-memory active-drop registry (priority, expiry)
-│   ├── interactions.js       # Claim button handler
-│   └── commands/             # /drop /collection /card /cooldowns /stats /spawn /give
+│   ├── pending.js            # In-memory pending-confirmation registry (trade/burn)
+│   ├── load-commands.js      # Auto-loads every command in commands/
+│   ├── interactions.js       # Button router (claim / trade / burn)
+│   └── commands/             # One file per slash command (auto-loaded)
 ├── db/
 │   ├── database.js           # SQLite connection + schema migration
 │   ├── users.js              # Users, collections, cooldowns, stats

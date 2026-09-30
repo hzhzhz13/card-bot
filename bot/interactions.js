@@ -1,5 +1,4 @@
-import { getDrop, reserveCard, inPriorityWindow } from './drops.js';
-import { getCard } from '../db/cards.js';
+import { getDrop, reserveCard } from './drops.js';
 import { ensureUser, grantCard } from '../db/users.js';
 import {
   claimCooldownRemaining,
@@ -8,6 +7,26 @@ import {
 } from './cooldowns.js';
 import { getRarity } from '../utils/rarity.js';
 import { buildClaimRow } from './commands/drop.js';
+import { handleTradeButton } from './commands/trade.js';
+import { handleBurnButton } from './commands/burn.js';
+
+/**
+ * Central button dispatcher. Button custom IDs are namespaced by a prefix
+ * before the first ":" — e.g. "claim:...", "trade:...", "burn:...".
+ */
+export async function routeButton(interaction) {
+  const prefix = interaction.customId.split(':')[0];
+  switch (prefix) {
+    case 'claim':
+      return handleClaimButton(interaction);
+    case 'trade':
+      return handleTradeButton(interaction);
+    case 'burn':
+      return handleBurnButton(interaction);
+    default:
+      return undefined;
+  }
+}
 
 /**
  * Handle a claim button press. customId format: "claim:<messageId>:<index>".

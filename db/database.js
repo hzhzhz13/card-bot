@@ -39,6 +39,20 @@ export function migrate() {
     CREATE INDEX IF NOT EXISTS idx_user_cards_user ON user_cards(user_id);
     CREATE INDEX IF NOT EXISTS idx_user_cards_card ON user_cards(card_id);
   `);
+
+  // Incremental columns (added after v1). ALTER TABLE ADD COLUMN is not
+  // idempotent, so guard each against the current schema.
+  addColumnIfMissing('users', 'coins', 'INTEGER NOT NULL DEFAULT 0');
+  addColumnIfMissing('users', 'daily_streak', 'INTEGER NOT NULL DEFAULT 0');
+  addColumnIfMissing('users', 'last_daily_at', 'INTEGER'); // epoch ms of last /daily
+}
+
+/** Add a column only if it doesn't already exist (safe on repeated startups). */
+function addColumnIfMissing(table, column, definition) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some((c) => c.name === column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
 }
 
 export function closeDb() {
